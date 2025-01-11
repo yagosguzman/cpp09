@@ -20,6 +20,7 @@ public:
 	bool validDate(std::string date);
 	bool validPrice(std::string price);
 	std::map<std::string, float> transferData(const std::string& file, char separator);
+	std::map<std::string, float> transferInput(const std::string& file, char separator);
 	float getPrice(std::string inputDate);
 	void exchange(void);
 	
