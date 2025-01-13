@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   BitcoinExchange.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpinilla <gpinilla@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 19:04:33 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/11 21:11:55 by gpinilla         ###   ########.fr       */
+/*   Updated: 2025/01/13 21:50:41 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,23 +17,21 @@
 #include <string>
 #include <algorithm>
 #include <stdexcept>
+#include <sstream>
 
 BitcoinExchange::BitcoinExchange()
 {
 	_mydata = transferData("data.csv", ',');
-	_input = transferInput("input.txt", '|');
 }
 
-BitcoinExchange::BitcoinExchange(std::string filename, char separator)
+BitcoinExchange::BitcoinExchange(std::string file)
 {
-		_mydata = transferData("data.csv", ',');
-		_input = transferInput(filename, separator);
+		_mydata = transferData(file, ',');
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy)
 {
 	_mydata = copy._mydata;
-	_input = copy._input;
 }
 
 BitcoinExchange::~BitcoinExchange()
@@ -42,7 +40,6 @@ BitcoinExchange::~BitcoinExchange()
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 {
 	_mydata = src._mydata;
-	_input = src._input;
 	return (*this);
 }
 
@@ -102,19 +99,19 @@ bool BitcoinExchange::validPrice(std::string price)
 	return true;
 }
 
-std::map<std::string, float> BitcoinExchange::transferData(const std::string& file, char separator)
+std::map<std::string, float> BitcoinExchange::transferData(const std::string& infile, char separator) // For modularity we put the separator as a variable
 {
 	std::map<std::string, float> mymap;
-	std::ifstream infile(file.c_str());
+	std::ifstream file(infile.c_str());
 
-	if (!infile.is_open())
+	if (!file.is_open())
 		throw BitcoinExchange::ErrorFile();
 	std::string line;
-	std::getline(infile, line);
-	while (std::getline(infile, line))
+	std::getline(file, line); // To skip the first line where there are no numbers
+	while (std::getline(file, line))
 	{
 		size_t separator_pos = line.find(separator);
-		if (separator_pos != std::string::npos)
+		if (separator_pos != std::string::npos) // If it doesn't find the separator, we'll skip the current line and check the next one
 		{
 			std::string date = line.substr(0, separator_pos);
 			std::string price = line.substr(separator_pos + 1);
@@ -124,45 +121,62 @@ std::map<std::string, float> BitcoinExchange::transferData(const std::string& fi
 				mymap[date] = fprice;
 			}
 			else
-				throw std::out_of_range("invalid data");
+				throw InvalidData();
 		}
 	}
-	infile.close();
+	file.close();
 	return mymap;
 }
 
-std::map<std::string, float> BitcoinExchange::transferInput(const std::string& file, char separator)
+void BitcoinExchange::convertInput(char const *infile)
 {
-	std::map<std::string, float> mymap;
-	std::ifstream infile(file.c_str());
-
-	if (!infile.is_open())
-		throw BitcoinExchange::ErrorFile();
+	std::ifstream file(infile);
+	if (!file.is_open())
+		throw ErrorFile();
 	std::string line;
-	std::getline(infile, line);
-	while (std::getline(infile, line))
+	std::getline(file, line);
+	while (std::getline(file, line))
 	{
+		std::string date;
+		std::string value;
+		float fvalue;
 		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
-		size_t separator_pos = line.find(separator);
-		if (separator_pos != std::string::npos)
+		std::istringstream ss(line);
+		std::getline(ss, date, '|');
+		std::getline(ss, value, '|');
+		if (date.empty())
 		{
-			try {
-				std::string date = line.substr(0, separator_pos);
-				std::string price = line.substr(separator_pos + 1);
-				if ((validDate(date) && validPrice(price)))
-				{
-					float fprice = std::atof(price.c_str());
-					mymap[date] = fprice;
-				}
-			}
-			catch(const std::out_of_range &e)
-			{}
-			// else
-			// 	throw BitcoinExchange::InvalidData();
+			std::cout << "Error: empty date" << std::endl;
+			continue;
 		}
+		if (value.empty())
+		{
+			std::cout << "Error: empty value" << std::endl;
+			continue;
+		}
+		if (validDate(date) == false)
+		{
+			std::cout << "Error: invalid date => " << date << std::endl;
+			continue;
+		}
+		if (validPrice(value))
+		{
+			fvalue = std::atof(value.c_str());
+			if (fvalue < 0)
+			{
+				std::cout << "Error: Not a positive number => " << value << std::endl;
+				continue;
+			}
+				if (fvalue > 1000)
+			{
+				std::cout << "Error: Too large a number => " << value << std::endl;
+				continue;
+			}
+			std::cout << date << " => " << value << " = " << (getPrice(date) * fvalue) << std::endl;
+		}
+		else
+			std::cout << "Error: invalid value => " << value << std::endl; // FALTA DISTINGUIR ENTRE NEGATIVOS Y ELEMENTOS NO VALIDOS
 	}
-	infile.close();
-	return mymap;
 }
 
 float BitcoinExchange::getPrice(std::string inputDate)
@@ -173,26 +187,6 @@ float BitcoinExchange::getPrice(std::string inputDate)
 		it = --it;
 	return it->second;
 }	
-
-void BitcoinExchange::exchange(void)
-{
-	std::map<std::string, float>::iterator it;
-	for (it = _input.begin(); it != _input.end(); it++)
-	{
-		try
-		{
-			if (!validDate(it->first))
-				throw BitcoinExchange::InvalidData();
-			if (it->second < 0 || it->second > 1000)
-				throw std::logic_error("Error: too large a number");
-			std::cout << it->first << " => " << it->second << " = " << getPrice(it->first)*it->second << std::endl;
-		}
-		catch(std::exception &e)
-		{
-			std::cout << e.what() << std::endl;
-		};
-	}
-}
 
 const char* BitcoinExchange::ErrorFile::what() const throw()
 {

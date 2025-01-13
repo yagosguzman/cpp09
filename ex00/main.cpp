@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpinilla <gpinilla@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 12:15:29 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/11 21:00:44 by gpinilla         ###   ########.fr       */
+/*   Updated: 2025/01/13 21:41:14 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,17 @@
 
 int main(int argc, char **argv)
 {
+	if (argc != 2)
+	{
+		std::cout << "Invalid number of arguments" << std::endl;
+		return 1;
+	}
 	try
 	{
-		if (argc != 2)
-			throw std::runtime_error("Invalid number of arguments");
-		else
-		{
-			BitcoinExchange test(argv[1], '|');
-			test.exchange();
-		}
+		BitcoinExchange test;
+		test.convertInput(argv[1]);
 	}
-	catch(const std::out_of_range &e)
-	{
-		std::cout << "Error: " << "Invalidad Data.csv" << '\n';
-	}
-	catch(const BitcoinExchange::ErrorFile &e)
-	{
-		std::cout << "Error: imposible open file" << '\n';
-	}
-	catch(const std::runtime_error &e)
+	catch(const std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
 	}

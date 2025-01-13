@@ -8,10 +8,9 @@ class BitcoinExchange
 {
 private:
 	std::map<std::string, float> _mydata;
-	std::map<std::string, float> _input;
 public:
 	BitcoinExchange();
-	BitcoinExchange(std::string filename, char separator);
+	BitcoinExchange(std::string file);
 	BitcoinExchange(const BitcoinExchange& copy);
 	~BitcoinExchange();
 
@@ -20,10 +19,9 @@ public:
 	bool validDate(std::string date);
 	bool validPrice(std::string price);
 	std::map<std::string, float> transferData(const std::string& file, char separator);
-	std::map<std::string, float> transferInput(const std::string& file, char separator);
+	void convertInput(char const *argv);
 	float getPrice(std::string inputDate);
-	void exchange(void);
-	
+
 	class ErrorFile : public std::exception{
 		public:
 			virtual const char* what() const throw();
