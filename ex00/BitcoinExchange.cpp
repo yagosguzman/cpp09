@@ -6,7 +6,7 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 19:04:33 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/14 19:56:46 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/14 20:58:45 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,20 @@
 BitcoinExchange::BitcoinExchange()
 {
 	_mydata = transferData("data.csv", ',');
-	_input = transferInput("input.txt", '|');
+	transferInput("input.txt");
 }
 
 BitcoinExchange::BitcoinExchange(std::string file, char *infile)
 {
 		_mydata = transferData(file, ',');
-		_input = transferInput(infile, '|');
+		transferInput(infile);
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy)
 {
 	_mydata = copy._mydata;
-	_input = copy._input;
+	_inputdate = copy._inputdate;
+	_inputvalue = copy._inputvalue;
 }
 
 BitcoinExchange::~BitcoinExchange()
@@ -43,7 +44,8 @@ BitcoinExchange::~BitcoinExchange()
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 {
 	_mydata = src._mydata;
-	_input = src._input;
+	_inputdate = src._inputdate;
+	_inputvalue = src._inputvalue;
 	return (*this);
 }
 
@@ -137,9 +139,8 @@ std::map<std::string, float> BitcoinExchange::transferData(const std::string& in
 	return mymap;
 }
 
-std::map<std::string, std::string> BitcoinExchange::transferInput(char const *infile, char separator)
+void BitcoinExchange::transferInput(char const *infile)
 {
-	std::map<std::string, std::string> input;
 	std::ifstream file(infile);
 	if (!file.is_open())
 		throw ErrorFile();
@@ -151,35 +152,35 @@ std::map<std::string, std::string> BitcoinExchange::transferInput(char const *in
 	{
 		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
 		std::istringstream ss(line);
-		std::getline(ss, date, separator);
-		std::getline(ss, value, separator);
-		input[date] = value;
+		std::getline(ss, date, '|');
+		std::getline(ss, value, '|');
+		_inputdate.push_back(date);
+		_inputvalue.push_back(value);
 	}
-	return input;
+	file.close();
 }
 	void BitcoinExchange::convertInput(void)
 {
-	std::map<std::string,std::string>::iterator it;
-	for (it = _input.begin(); it != _input.end(); it++)
+	for (size_t i = 0; i < _inputdate.size(); i++)
 	{
-		if (it->first.empty())
+		if (_inputdate[i].empty())
 		{
 			std::cout << "Error: empty date" << std::endl;
 			continue;
 		}
-		if (it->second.empty())
+		if (_inputvalue[i].empty())
 		{
 			std::cout << "Error: empty value" << std::endl;
 			continue;
 		}
-		if (validDate(it->first) == false)
+		if (validDate(_inputdate[i]) == false)
 		{
-			std::cout << "Error: invalid date => " << it->first << std::endl;
+			std::cout << "Error: invalid date => " << _inputdate[i] << std::endl;
 			continue;
 		}
-		if (validPrice(it->second))
+		if (validPrice(_inputvalue[i]))
 		{
-			float value = std::atof(it->second.c_str());
+			float value = std::atof(_inputvalue[i].c_str());
 			if (value < 0)
 			{
 				std::cout << "Error: Not a positive number => " << value << std::endl;
@@ -190,10 +191,10 @@ std::map<std::string, std::string> BitcoinExchange::transferInput(char const *in
 				std::cout << "Error: Too large a number => " << value << std::endl;
 				continue;
 			}
-			std::cout << it->first << " => " << it->second << " = " << (getPrice(it->first) * value) << std::endl;
+			std::cout << _inputdate[i] << " => " << _inputvalue[i] << " = " << (getPrice(_inputdate[i]) * value) << std::endl;
 		}
 		else
-			std::cout << "Error: invalid value => " << it->second << std::endl; // FALTA DISTINGUIR ENTRE NEGATIVOS Y ELEMENTOS NO VALIDOS
+			std::cout << "Error: invalid value => " << _inputvalue[i] << std::endl;
 	}
 }
 
@@ -204,7 +205,7 @@ float BitcoinExchange::getPrice(std::string inputDate)
 	if (it != _mydata.begin() && it->first != inputDate)
 		it = --it;
 	return it->second;
-}	
+}
 
 const char* BitcoinExchange::ErrorFile::what() const throw()
 {
