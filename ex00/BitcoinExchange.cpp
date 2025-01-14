@@ -6,7 +6,7 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 19:04:33 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/13 21:50:41 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/14 19:56:46 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,19 @@
 BitcoinExchange::BitcoinExchange()
 {
 	_mydata = transferData("data.csv", ',');
+	_input = transferInput("input.txt", '|');
 }
 
-BitcoinExchange::BitcoinExchange(std::string file)
+BitcoinExchange::BitcoinExchange(std::string file, char *infile)
 {
 		_mydata = transferData(file, ',');
+		_input = transferInput(infile, '|');
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy)
 {
 	_mydata = copy._mydata;
+	_input = copy._input;
 }
 
 BitcoinExchange::~BitcoinExchange()
@@ -40,6 +43,7 @@ BitcoinExchange::~BitcoinExchange()
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 {
 	_mydata = src._mydata;
+	_input = src._input;
 	return (*this);
 }
 
@@ -81,18 +85,20 @@ bool BitcoinExchange::validDate(std::string date)
 bool BitcoinExchange::validPrice(std::string price)
 {
 	size_t dot = 0;
-	if (price.at(0) < '0' || price.at(0) > '9')
-		return false;
-	for (size_t i = 1; i < price.length(); i++)
+	size_t i = 0;
+	if (price.at(0) == '-' || price.at(0) == '+')
+		i++;
+	while(i < price.length())
 	{
+		if ((price.at(i) < '0' || price.at(i) > '9') && price.at(i) != '.')
+			return false;
 		if (price.at(i) == '.')
 		{
 			dot++;
 			if (i == 0 || i == price.length() - 1)
 				return false;
 		}
-		if ((price.at(i) < '0' || price.at(i) > '9') && price.at(i) != '.')
-			return false;
+		i++;
 	}
 	if (dot > 1)
 		return false;
@@ -118,7 +124,10 @@ std::map<std::string, float> BitcoinExchange::transferData(const std::string& in
 			if ((validDate(date) && validPrice(price)))
 			{
 				float fprice = std::atof(price.c_str());
-				mymap[date] = fprice;
+				if (fprice < 0)
+					throw InvalidData();
+				else
+					mymap[date] = fprice;
 			}
 			else
 				throw InvalidData();
@@ -128,54 +137,63 @@ std::map<std::string, float> BitcoinExchange::transferData(const std::string& in
 	return mymap;
 }
 
-void BitcoinExchange::convertInput(char const *infile)
+std::map<std::string, std::string> BitcoinExchange::transferInput(char const *infile, char separator)
 {
+	std::map<std::string, std::string> input;
 	std::ifstream file(infile);
 	if (!file.is_open())
 		throw ErrorFile();
 	std::string line;
 	std::getline(file, line);
+	std::string date;
+	std::string value;
 	while (std::getline(file, line))
 	{
-		std::string date;
-		std::string value;
-		float fvalue;
 		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
 		std::istringstream ss(line);
-		std::getline(ss, date, '|');
-		std::getline(ss, value, '|');
-		if (date.empty())
+		std::getline(ss, date, separator);
+		std::getline(ss, value, separator);
+		input[date] = value;
+	}
+	return input;
+}
+	void BitcoinExchange::convertInput(void)
+{
+	std::map<std::string,std::string>::iterator it;
+	for (it = _input.begin(); it != _input.end(); it++)
+	{
+		if (it->first.empty())
 		{
 			std::cout << "Error: empty date" << std::endl;
 			continue;
 		}
-		if (value.empty())
+		if (it->second.empty())
 		{
 			std::cout << "Error: empty value" << std::endl;
 			continue;
 		}
-		if (validDate(date) == false)
+		if (validDate(it->first) == false)
 		{
-			std::cout << "Error: invalid date => " << date << std::endl;
+			std::cout << "Error: invalid date => " << it->first << std::endl;
 			continue;
 		}
-		if (validPrice(value))
+		if (validPrice(it->second))
 		{
-			fvalue = std::atof(value.c_str());
-			if (fvalue < 0)
+			float value = std::atof(it->second.c_str());
+			if (value < 0)
 			{
 				std::cout << "Error: Not a positive number => " << value << std::endl;
 				continue;
 			}
-				if (fvalue > 1000)
+				if (value > 1000)
 			{
 				std::cout << "Error: Too large a number => " << value << std::endl;
 				continue;
 			}
-			std::cout << date << " => " << value << " = " << (getPrice(date) * fvalue) << std::endl;
+			std::cout << it->first << " => " << it->second << " = " << (getPrice(it->first) * value) << std::endl;
 		}
 		else
-			std::cout << "Error: invalid value => " << value << std::endl; // FALTA DISTINGUIR ENTRE NEGATIVOS Y ELEMENTOS NO VALIDOS
+			std::cout << "Error: invalid value => " << it->second << std::endl; // FALTA DISTINGUIR ENTRE NEGATIVOS Y ELEMENTOS NO VALIDOS
 	}
 }
 
