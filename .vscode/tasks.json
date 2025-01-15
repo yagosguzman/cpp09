@@ -13,7 +13,7 @@
 		"problemMatcher": [],
 		"detail": "Ejecuta 'make re' para compilar el proyecto.",
 		"options": {
-		  "cwd": "${workspaceFolder}/ex00" // Cambia a la ruta donde está tu Makefile
+		  "cwd": "${workspaceFolder}/ex01" // Cambia a la ruta donde está tu Makefile
 		}
 	  }
 	]
