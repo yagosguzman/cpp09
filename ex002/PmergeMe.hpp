@@ -15,7 +15,7 @@ public:
 	~PmergeMe();
 	PmergeMe& operator=(const PmergeMe& src);
 
-	void parse_args(const std::string& arg);
+	int parse_args(const std::string& arg);
 };
 
 #endif
