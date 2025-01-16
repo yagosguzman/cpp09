@@ -6,7 +6,7 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 18:10:12 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/16 18:18:08 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/16 18:26:58 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,12 @@
 
 void PmergeMe::parse_args(const std::string& arg)
 {
-
-	for (size_t i = 0; i < arg.size(); i++)
+	if (arg.size() == '0')
+		throw std::invalid_argument ("Error: empty argument found");
+	size_t i = 0;
+	if (arg.at(0) == '+')
+		i = 1;
+	for (i; i < arg.size(); i++)
 	{
 		if ()
 	}
