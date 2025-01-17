@@ -10,39 +10,43 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& src) {
 };
 PmergeMe::~PmergeMe(){};
 
-void PmergeMe::mergePairs(std::vector<int> a, std::vector<int> b) {
+void PmergeMe::mergePairs(std::vector<int> a, std::vector<int> b, std::vector<int> a1, std::vector<int> b1) {
 
 }
 
-void PmergeMe::divideAndSortPairs(std::vector<int> a, std::vector<int> b) {
+void PmergeMe::divideAndSortPairs(std::vector<int> a, std::vector<int> b, std::vector<int> a1, std::vector<int> b1) {
 	for (size_t i = 0; i < a.size() - 1; i += 2) {
 		if (a[i] > a[i + 1]) {
-			b.push_back(a[i]);
+			a1.push_back(a[i]);
 			a.erase(a.begin() + i);
+			b1.push_back(b[i]);
+			b.erase(b.begin() + i);
 		}
 		else { 
-			b.push_back(a[i + 1]);
+			a1.push_back(a[i + 1]);
 			a.erase(a.begin() + i + 1);
+			b1.push_back(b[i + 1]);
+			b.erase(b.begin() + i + 1);
 		}
 	}
 };
 
-void PmergeMe::mergeInsertionSort(std::vector<int> a) {
-	int odd;
-	std::vector<int> b;
-	if (a.size() % 2 != 0) {
-		odd = a.at(a.size() - 1);
-		a.pop_back();
-	}
-	divideAndSortPairs(a ,b);
+void
+
+void PmergeMe::mergeInsertionSort(std::vector<int> a, std::vector<int> b) {
+	std::vector<int> a1;
+	std::vector<int> b1;
+
+	divideAndSortPairs(a, b, a1, b1);
 	if (a.size() > 2)
-		mergeInsertionSort(a);
-	mergePairs(a, b);
+		mergeInsertionSort(a, b);
+	mergePairs(a, b, a1, b1);
 	
 }
 
 std::vector<int> PmergeMe::sort(size_t size, char** arg)
 {	std::vector<int> a;
+	std::vector<int> b;
 	for (size_t i = 0; i < size; i++)
 		a.push_back(parse_args(arg[i]));
 	mergeInsertionSort(a);
