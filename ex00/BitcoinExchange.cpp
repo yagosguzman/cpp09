@@ -6,7 +6,7 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/10 19:04:33 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/14 20:58:45 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/17 19:19:21 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,16 @@
 BitcoinExchange::BitcoinExchange()
 {
 	_mydata = transferData("data.csv", ',');
-	transferInput("input.txt");
 }
 
-BitcoinExchange::BitcoinExchange(std::string file, char *infile)
+BitcoinExchange::BitcoinExchange(std::string file, char separator)
 {
-		_mydata = transferData(file, ',');
-		transferInput(infile);
+	_mydata = transferData(file, separator);
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy)
 {
 	_mydata = copy._mydata;
-	_inputdate = copy._inputdate;
-	_inputvalue = copy._inputvalue;
 }
 
 BitcoinExchange::~BitcoinExchange()
@@ -44,8 +40,6 @@ BitcoinExchange::~BitcoinExchange()
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 {
 	_mydata = src._mydata;
-	_inputdate = src._inputdate;
-	_inputvalue = src._inputvalue;
 	return (*this);
 }
 
@@ -113,7 +107,7 @@ std::map<std::string, float> BitcoinExchange::transferData(const std::string& in
 	std::ifstream file(infile.c_str());
 
 	if (!file.is_open())
-		throw BitcoinExchange::ErrorFile();
+		throw ErrorFile();
 	std::string line;
 	std::getline(file, line); // To skip the first line where there are no numbers
 	while (std::getline(file, line))
@@ -139,62 +133,56 @@ std::map<std::string, float> BitcoinExchange::transferData(const std::string& in
 	return mymap;
 }
 
-void BitcoinExchange::transferInput(char const *infile)
+void BitcoinExchange::convertInput(char* infile)
 {
 	std::ifstream file(infile);
 	if (!file.is_open())
 		throw ErrorFile();
 	std::string line;
 	std::getline(file, line);
-	std::string date;
-	std::string value;
+	if (line.compare("date | value") != 0)
+		throw InvalidData();
 	while (std::getline(file, line))
 	{
+		std::string date;
+		std::string value;
+		float fvalue;
 		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
 		std::istringstream ss(line);
 		std::getline(ss, date, '|');
 		std::getline(ss, value, '|');
-		_inputdate.push_back(date);
-		_inputvalue.push_back(value);
-	}
-	file.close();
-}
-	void BitcoinExchange::convertInput(void)
-{
-	for (size_t i = 0; i < _inputdate.size(); i++)
-	{
-		if (_inputdate[i].empty())
+		if (date.empty())
 		{
 			std::cout << "Error: empty date" << std::endl;
 			continue;
 		}
-		if (_inputvalue[i].empty())
+		if (value.empty())
 		{
 			std::cout << "Error: empty value" << std::endl;
 			continue;
 		}
-		if (validDate(_inputdate[i]) == false)
+		if (validDate(date) == false)
 		{
-			std::cout << "Error: invalid date => " << _inputdate[i] << std::endl;
+			std::cout << "Error: invalid date => " << date << std::endl;
 			continue;
 		}
-		if (validPrice(_inputvalue[i]))
+		if (validPrice(value))
 		{
-			float value = std::atof(_inputvalue[i].c_str());
-			if (value < 0)
+			fvalue = std::atof(value.c_str());
+			if (fvalue < 0)
 			{
 				std::cout << "Error: Not a positive number => " << value << std::endl;
 				continue;
 			}
-				if (value > 1000)
+				if (fvalue > 1000)
 			{
 				std::cout << "Error: Too large a number => " << value << std::endl;
 				continue;
 			}
-			std::cout << _inputdate[i] << " => " << _inputvalue[i] << " = " << (getPrice(_inputdate[i]) * value) << std::endl;
+			std::cout << date << " => " << value << " = " << (getPrice(date) * fvalue) << std::endl;
 		}
 		else
-			std::cout << "Error: invalid value => " << _inputvalue[i] << std::endl;
+			std::cout << "Error: invalid value => " << value << std::endl;
 	}
 }
 

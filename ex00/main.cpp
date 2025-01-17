@@ -6,7 +6,7 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 12:15:29 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/14 19:40:22 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/17 19:05:53 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ int main(int argc, char **argv)
 	}
 	try
 	{
-		BitcoinExchange test("data.csv", argv[1]);
-		test.convertInput();
+		BitcoinExchange test;
+		test.convertInput(argv[1]);
 	}
 	catch(const std::exception &e)
 	{
