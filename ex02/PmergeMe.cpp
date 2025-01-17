@@ -10,31 +10,43 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& src) {
 };
 PmergeMe::~PmergeMe(){};
 
+void PmergeMe::mergePairs(std::vector<int> a, std::vector<int> b) {
 
-static void divideAndSortPairs(const size_t& size, int numbers[], std::vector<int> a, std::vector<int> b) {
-	for (size_t i = 0; i < size - 1; i += 2) {
-		if (numbers[i] > numbers[i + 1]){
-			a.push_back(numbers[i + 1]);
-			b.push_back(numbers[i]);
+}
+
+void PmergeMe::divideAndSortPairs(std::vector<int> a, std::vector<int> b) {
+	for (size_t i = 0; i < a.size() - 1; i += 2) {
+		if (a[i] > a[i + 1]) {
+			b.push_back(a[i]);
+			a.erase(a.begin() + i);
 		}
 		else { 
-			a.push_back(numbers[i]);
-			b.push_back(numbers[i + 1]);
+			b.push_back(a[i + 1]);
+			a.erase(a.begin() + i + 1);
 		}
 	}
 };
 
-
-void PmergeMe::sort(size_t size, char** arg)
-{	int numbers[size];
-	std::vector<int> a;
-	std::vector<int> b;
-	for (size_t i = 0; i < size; i++)
-		numbers[i] = parse_args(arg[i]);
+void PmergeMe::mergeInsertionSort(std::vector<int> a) {
 	int odd;
-	if (size % 2 != 0)
-		odd = numbers[size - 1];
-	divideAndSortPairs(size, numbers, a ,b);
+	std::vector<int> b;
+	if (a.size() % 2 != 0) {
+		odd = a.at(a.size() - 1);
+		a.pop_back();
+	}
+	divideAndSortPairs(a ,b);
+	if (a.size() > 2)
+		mergeInsertionSort(a);
+	mergePairs(a, b);
+	
+}
+
+std::vector<int> PmergeMe::sort(size_t size, char** arg)
+{	std::vector<int> a;
+	for (size_t i = 0; i < size; i++)
+		a.push_back(parse_args(arg[i]));
+	mergeInsertionSort(a);
+	return (a);	
 };
 
 int PmergeMe::parse_args(const std::string& arg)

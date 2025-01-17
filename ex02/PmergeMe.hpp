@@ -17,9 +17,12 @@ private:
 	~PmergeMe();
 	
 	static int parse_args(const std::string& arg);
+	static void mergeInsertionSort(std::vector<int> a);
+	static void divideAndSortPairs(std::vector<int> a, std::vector<int> b);
+	static void mergePairs(std::vector<int> a, std::vector<int> b);
 	
 	public:
-	static void sort(size_t size, char** arg);
+	static std::vector<int> sort(size_t size, char** arg);
 
 };
 
