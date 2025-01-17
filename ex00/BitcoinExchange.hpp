@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <map>
-#include <algorithm>
-#include <vector>
 
 class BitcoinExchange
 {
@@ -22,8 +20,8 @@ public:
 	bool validDate(std::string date);
 	bool validPrice(std::string price);
 	std::map<std::string, float> transferData(const std::string& file, char separator);
-	void convertInput(char* infile);
 	float getPrice(std::string inputDate);
+	void convertInput(char* infile);
 
 	class ErrorFile : public std::exception{
 		public:

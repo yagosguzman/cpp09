@@ -10,6 +10,23 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& src) {
 };
 PmergeMe::~PmergeMe(){};
 
+std::vector<int> jacobsthal(int size)
+{
+	std::vector<int>jacobs;
+	int i, j = 1;
+	int k;
+	int it = 0;
+	jacobs.push_back(i);
+	while (it < size)
+	{
+		k = j;
+		j += (2*i);
+		jacobs.push_back(j);
+		i = k;
+		it++;
+	}
+}
+
 void PmergeMe::mergePairs(std::vector<int> a, std::vector<int> b, std::vector<int> a1, std::vector<int> b1) {
 
 }
