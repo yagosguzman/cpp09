@@ -10,63 +10,135 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& src) {
 };
 PmergeMe::~PmergeMe(){};
 
-std::vector<int> jacobsthal(int size)
-{
-	std::vector<int>jacobs;
-	int i, j = 1;
-	int k;
-	int it = 0;
-	jacobs.push_back(i);
-	while (it < size)
-	{
-		k = j;
-		j += (2*i);
-		jacobs.push_back(j);
-		i = k;
-		it++;
-	}
+// Función que genera la serie de grupos de Jacobsthal ajustada al tamaño
+std::vector<int> PmergeMe::generateJacobsthalSeriesAdjusted(int size) {
+    std::vector<int> series;
+    // Generar los números de Jacobsthal directamente
+    int prev = 0, curr = 1;
+    while (curr <= size) {
+        // Agregar el grupo definido por [prev+1, curr] en orden inverso
+        for (int i = curr; i > prev; --i) {
+            series.push_back(i);
+        }
+        // Calcular el siguiente número de Jacobsthal
+        int next = curr + 2 * prev;
+        prev = curr;
+        curr = next;
+    }
+    // Si el tamaño no cuadra con un número de Jacobsthal
+    if (prev < size) {
+        // Agregar los índices restantes desde `size` hacia `prev+1`
+        for (int i = size; i > prev; --i) {
+            series.push_back(i);
+        }
+    }
+    return series;
 }
 
-void PmergeMe::mergePairs(std::vector<int> a, std::vector<int> b, std::vector<int> a1, std::vector<int> b1) {
+int PmergeMe::binarySearchLimited(const std::vector<int>& a, int item, int maxIndex) {
+    int low = 0;
+    int high = maxIndex; // Ajustamos 'high' para que sea inclusivo
 
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+
+        if (item < a[mid]) {
+            high = mid - 1; // Mover el rango superior
+        } else {
+            low = mid + 1; // Mover el rango inferior
+        }
+    }
+
+    return low; // Retornar la posición de inserción
 }
 
-void PmergeMe::divideAndSortPairs(std::vector<int> a, std::vector<int> b, std::vector<int> a1, std::vector<int> b1) {
-	for (size_t i = 0; i < a.size() - 1; i += 2) {
-		if (a[i] > a[i + 1]) {
-			a1.push_back(a[i]);
-			a.erase(a.begin() + i);
-			b1.push_back(b[i]);
-			b.erase(b.begin() + i);
-		}
-		else { 
-			a1.push_back(a[i + 1]);
-			a.erase(a.begin() + i + 1);
-			b1.push_back(b[i + 1]);
-			b.erase(b.begin() + i + 1);
-		}
+void PmergeMe::mergePairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1) {
+	std::vector<int> jacobsthal;
+	int pos;
+	jacobsthal = generateJacobsthalSeriesAdjusted(a1.size());
+	for (size_t i = 0; i < a1.size(); i++) {
+		pos = binarySearchLimited(a, a1.at(jacobsthal.at(i) - 1), jacobsthal.at(i) - 1);
+		a.insert(a.begin() + pos, a1.at(jacobsthal.at(i) - 1));
+		b.insert(b.begin() + pos, b1.at(jacobsthal.at(i) - 1));
 	}
+	
+}
+
+void PmergeMe::divideAndSortPairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1) {
+	 std::vector<int> new_a, new_b; // Vectores temporales para almacenar los valores restantes
+
+    // Iterar sobre los pares en a y b
+    for (size_t i = 0; i + 1 < a.size(); i += 2) {
+        // Comparar los elementos del par
+        if (a[i] < a[i + 1]) {
+            a1.push_back(a[i]);         // Menor valor a a1
+            b1.push_back(b[i]);         // Menor valor a b1
+            new_a.push_back(a[i + 1]);  // Mayor valor a new_a
+            new_b.push_back(b[i + 1]);  // Mayor valor a new_b
+        } else {
+            a1.push_back(a[i + 1]);     // Menor valor a a1
+            b1.push_back(b[i + 1]);     // Menor valor a b1
+            new_a.push_back(a[i]);      // Mayor valor a new_a
+            new_b.push_back(b[i]);      // Mayor valor a new_b
+        }
+    }
+
+    // Actualizar los vectores originales
+    a = new_a;
+    b = new_b;
 };
 
-void
-
-void PmergeMe::mergeInsertionSort(std::vector<int> a, std::vector<int> b) {
+void PmergeMe::mergeInsertionSort(std::vector<int>& a, std::vector<int>& b) {
 	std::vector<int> a1;
 	std::vector<int> b1;
+	int odd_a = -1;
+	int odd_b = -1;
+	int pos;
 
+	if (a.size() % 2 != 0){
+		odd_a = a.at(a.size() - 1);
+		a.erase(a.begin() + a.size() - 1);
+		odd_b = b.at(b.size() - 1);
+		b.erase(b.begin() + b.size() - 1);
+	}
 	divideAndSortPairs(a, b, a1, b1);
 	if (a.size() > 2)
 		mergeInsertionSort(a, b);
 	mergePairs(a, b, a1, b1);
-	
+	if (odd_a != -1) {
+		pos = binarySearchLimited(a, odd_a, a.size() - 1);
+		a.insert(a.begin() + pos, odd_a);
+		b.insert(b.begin() + pos, odd_b);
+	}
 }
 
 std::vector<int> PmergeMe::sort(size_t size, char** arg)
-{	std::vector<int> a;
+{	std::vector<int> numbers;
+	std::vector<int> a;
 	std::vector<int> b;
+	
+	int odd = -1;
+
 	for (size_t i = 0; i < size; i++)
-		a.push_back(parse_args(arg[i]));
-	mergeInsertionSort(a);
+		numbers.push_back(parse_args(arg[i]));
+	if (numbers.size() % 2 != 0) {
+		odd = numbers.at(a.size() - 1);
+		numbers.erase(numbers.begin() + numbers.size() - 1);
+	}
+	for (size_t i = 0; i + 1 < numbers.size(); i += 2) {
+        // Comparar los elementos del par
+        if (numbers[i] < numbers[i + 1]) {
+            a.push_back(numbers[i + 1]);         // Menor valor a a1
+            b.push_back(numbers[i]);         // Menor valor a b1
+        } else {
+            a.push_back(numbers[i]);         // Menor valor a a1
+            b.push_back(numbers[i + 1]);       // Menor valor a b1
+        }
+    }
+	mergeInsertionSort(a, b);
+	if (odd != -1) 
+		a.insert(a.begin() + binarySearchLimited(a, odd, a.size() - 1), odd);
+	
 	return (a);	
 };
 
