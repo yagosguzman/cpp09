@@ -9,17 +9,12 @@ int main (int argc, char **argv){
 	std::vector<int> sortedNumbers;
 	try
 	{
-		sortedNumbers = PmergeMe::sort(static_cast<size_t>(argc - 1), &argv[1]);
+		PmergeMe::sort_v(static_cast<size_t>(argc - 1), &argv[1]);
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
 		return 1;
 	}
-	std::cout << "Sorted numbers:: " << std::endl;
-	for (size_t i = 0; i < sortedNumbers.size(); i++) {
-		std::cout << sortedNumbers[i] << " ";
-	}
-	std::cout << std::endl;
 	return 0;	
 }
