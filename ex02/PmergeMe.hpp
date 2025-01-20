@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <climits>
 #include <string>
+#include <ctime> // Para clock() y CLOCKS_PER_SEC
 
 
 class PmergeMe

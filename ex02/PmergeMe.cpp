@@ -38,9 +38,10 @@ std::vector<int> PmergeMe::generateJacobsthalSeriesAdjusted(int size) {
 int PmergeMe::binarySearchLimited(const std::vector<int>& a, int item, int maxIndex) {
     int low = 0;
     int high = maxIndex; // Ajustamos 'high' para que sea inclusivo
+	int mid;
 
     while (low <= high) {
-        int mid = low + (high - low) / 2;
+        mid = low + ((high - low) / 2);
 
         if (item < a[mid]) {
             high = mid - 1; // Mover el rango superior
@@ -54,10 +55,11 @@ int PmergeMe::binarySearchLimited(const std::vector<int>& a, int item, int maxIn
 
 void PmergeMe::mergePairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1) {
 	std::vector<int> jacobsthal;
+
 	int pos;
 	jacobsthal = generateJacobsthalSeriesAdjusted(a1.size());
 	for (size_t i = 0; i < a1.size(); i++) {
-		pos = binarySearchLimited(a, a1.at(jacobsthal.at(i) - 1), jacobsthal.at(i) - 1);
+		pos = binarySearchLimited(a, a1.at(jacobsthal.at(i) - 1), a.size() - 1);
 		a.insert(a.begin() + pos, a1.at(jacobsthal.at(i) - 1));
 		b.insert(b.begin() + pos, b1.at(jacobsthal.at(i) - 1));
 	}
@@ -118,13 +120,14 @@ std::vector<int> PmergeMe::sort(size_t size, char** arg)
 	std::vector<int> b;
 	
 	int odd = -1;
-
 	for (size_t i = 0; i < size; i++)
 		numbers.push_back(parse_args(arg[i]));
+	std::clock_t start = std::clock();
 	if (numbers.size() % 2 != 0) {
-		odd = numbers.at(a.size() - 1);
+		odd = numbers.at(numbers.size() - 1);
 		numbers.erase(numbers.begin() + numbers.size() - 1);
 	}
+	
 	for (size_t i = 0; i + 1 < numbers.size(); i += 2) {
         // Comparar los elementos del par
         if (numbers[i] < numbers[i + 1]) {
@@ -134,18 +137,29 @@ std::vector<int> PmergeMe::sort(size_t size, char** arg)
             a.push_back(numbers[i]);         // Menor valor a a1
             b.push_back(numbers[i + 1]);       // Menor valor a b1
         }
-    }
+}
 	mergeInsertionSort(a, b);
 	std::vector<int> jacobsthal;
+
+
 	int pos;
 	jacobsthal = generateJacobsthalSeriesAdjusted(b.size());
 	for (size_t i = 0; i < b.size(); i++) {
-		pos = binarySearchLimited(a, b.at(jacobsthal.at(i) - 1), jacobsthal.at(i) - 1);
+		pos = binarySearchLimited(a, b.at(jacobsthal.at(i) - 1), a.size() - 1);
 		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
 	}
+
+
+
+
+	
 	if (odd != -1) 
 		a.insert(a.begin() + binarySearchLimited(a, odd, a.size() - 1), odd);
-	
+	std::clock_t end = std::clock();
+	double elapsed_microseconds = static_cast<double>(end - start) * 1000000.0 / CLOCKS_PER_SEC;
+
+    // Imprime el tiempo transcurrido
+    std::cout << "Tiempo de ejecución: " << elapsed_microseconds << " us" << std::endl;
 	return (a);	
 };
 
