@@ -10,6 +10,7 @@ int main (int argc, char **argv){
 	try
 	{
 		PmergeMe::sort_v(static_cast<size_t>(argc - 1), &argv[1]);
+		PmergeMe::sort_l(static_cast<size_t>(argc - 1), &argv[1]);
 	}
 	catch(const std::exception& e)
 	{

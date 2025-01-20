@@ -1,6 +1,0 @@
-make --dry-run --always-make --keep-going --print-directory
-make: Entering directory '/home/gpinilla/Homemade/Cpp9'
-make: Leaving directory '/home/gpinilla/Homemade/Cpp9'
- 
-make: *** No targets specified and no makefile found.  Stop.
-

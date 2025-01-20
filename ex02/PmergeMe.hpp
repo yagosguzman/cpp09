@@ -6,6 +6,7 @@
 #include <climits>
 #include <string>
 #include <ctime> // Para clock() y CLOCKS_PER_SEC
+#include <list>
 
 
 class PmergeMe
@@ -23,9 +24,14 @@ private:
 	static void divideAndSortPairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1);
 	static void mergePairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1);
 	static int binarySearch(const std::vector<int>& a, int item, int maxIndex);
+	static void printVector(std::vector<int>vector, int mode);
+
+	static void printList(std::list<int> list, int mode);
+
 	
 	public:
 	static void sort_v(size_t size, char** arg);
+	static void sort_l(size_t size, char** arg);
 
 };
 

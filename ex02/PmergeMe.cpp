@@ -111,6 +111,21 @@ void PmergeMe::mergeInsertionSort(std::vector<int>& a, std::vector<int>& b) {
 	}
 }
 
+void PmergeMe::printVector(std::vector<int>vector, int mode)
+{
+	if (mode == 0)
+		std::cout << "Before: ";
+	else if (mode == 1)
+		std::cout << "After: ";
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		std::cout << vector.at(i);
+		if (i + 1 != vector.size())
+			std::cout << " ";
+		else 
+			std::cout << std::endl;
+	}
+}
 void PmergeMe::sort_v(size_t size, char** arg)
 {	std::vector<int> numbers;
 	std::vector<int> a;
@@ -119,17 +134,10 @@ void PmergeMe::sort_v(size_t size, char** arg)
 
 	for (size_t i = 0; i < size; i++)
 		numbers.push_back(parse_args(arg[i]));
-	std::cout << "Before: ";
-	for (size_t i = 0; i < numbers.size(); i++)
-	{
-		std::cout << numbers.at(i);
-		if (i + 1 != numbers.size())
-			std::cout << " ";
-		else 
-			std::cout << std::endl;
-	}
+	printVector(numbers, 0);
 	std::clock_t start = std::clock();
-	if (numbers.size() % 2 != 0) {
+	if (numbers.size() % 2 != 0)
+	{
 		odd = numbers.at(numbers.size() - 1);
 		numbers.erase(numbers.begin() + numbers.size() - 1);
 	}
@@ -158,15 +166,7 @@ void PmergeMe::sort_v(size_t size, char** arg)
 	if (odd != -1) 
 		a.insert(a.begin() + binarySearch(a, odd, a.size() - 1), odd);
 	std::clock_t end = std::clock();
-	std::cout << "After: ";
-	for (size_t i = 0; i < a.size(); i++)
-	{
-		std::cout << a.at(i);
-		if (i + 1 != a.size())
-			std::cout << " ";
-		else 
-			std::cout << std::endl;
-	}
+	printVector(a, 1);
 	double elapsed_microseconds = static_cast<double>(end - start) * 1000000.0 / CLOCKS_PER_SEC;
     std::cout << "Time to process a range of " << numbers.size() << " elements with std::vector : " << elapsed_microseconds << " us" << std::endl;
 };
