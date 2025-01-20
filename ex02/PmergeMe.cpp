@@ -136,6 +136,13 @@ std::vector<int> PmergeMe::sort(size_t size, char** arg)
         }
     }
 	mergeInsertionSort(a, b);
+	std::vector<int> jacobsthal;
+	int pos;
+	jacobsthal = generateJacobsthalSeriesAdjusted(b.size());
+	for (size_t i = 0; i < b.size(); i++) {
+		pos = binarySearchLimited(a, b.at(jacobsthal.at(i) - 1), jacobsthal.at(i) - 1);
+		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
+	}
 	if (odd != -1) 
 		a.insert(a.begin() + binarySearchLimited(a, odd, a.size() - 1), odd);
 	

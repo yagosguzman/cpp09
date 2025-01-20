@@ -18,7 +18,7 @@ int main (int argc, char **argv){
 	}
 	std::cout << "Sorted numbers:: " << std::endl;
 	for (size_t i = 0; i < sortedNumbers.size(); i++) {
-		std::cout << sortedNumbers[i] ;
+		std::cout << sortedNumbers[i] << " ";
 	}
 	std::cout << std::endl;
 	return 0;	
