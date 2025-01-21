@@ -6,7 +6,7 @@
 /*   By: gpinilla <gpinilla@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 20:34:31 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/21 17:51:31 by gpinilla         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:03:22 by gpinilla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,4 +47,23 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 		odd = *it;
 		numbers.erase(it); 
 	}
+	for (std::list<int>::iterator it = numbers.begin(); it + 1 < numbers.size(); it += 2)
+	{
+		std::list<int>::iterator next = it;
+		next++;
+		if (next != numbers.end())
+		{
+			if (*it < *next)
+			{
+				a.push_back(*next);
+				b.push_back(*it);
+			}
+			else
+			{
+				a.push_back(*it);
+				b.push_back(*next)
+			}
+		}
+	}
+	mergeInsertionList(a, b);
 }
