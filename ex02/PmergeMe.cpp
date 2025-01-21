@@ -103,6 +103,11 @@ void PmergeMe::mergeInsertionSort(std::vector<int>& a, std::vector<int>& b) {
 	divideAndSortPairs(a, b, a1, b1);
 	if (a.size() > 2)
 		mergeInsertionSort(a, b);
+	else if (a.at(0) > a.at(1)) { 
+		int aux = a.at(0);
+		a.at(0) = a.at(1);
+		a.at(1) = aux;
+	}
 	mergePairs(a, b, a1, b1);
 	if (odd_a != -1) {
 		int pos = binarySearch(a, odd_a, a.size() - 1);

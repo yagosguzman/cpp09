@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PmergeMeList.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gpinilla <gpinilla@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 20:34:31 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/20 21:40:12 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/21 17:51:31 by gpinilla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 	for (size_t i = 0; i < size; i++)
 		numbers.push_back(parse_args(arg[i]));
 	printList(numbers, 0);
-	std::clock_t start = std::clock();
+	//std::clock_t start = std::clock();
 	if (numbers.size() % 2 != 0)
 	{
 		std::list<int>::iterator it = numbers.end();
