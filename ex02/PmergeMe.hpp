@@ -26,6 +26,8 @@ private:
 	static int binarySearch(const std::vector<int>& a, int item, int maxIndex);
 	static void printVector(std::vector<int>vector, int mode);
 
+	static void mergeInsertionList(std::list<int> &a, std::list<int> &b);
+	static std::list<int> jacobsthalGeneratorList(int size);
 	static void printList(std::list<int> list, int mode);
 
 	

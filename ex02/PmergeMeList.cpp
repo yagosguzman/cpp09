@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PmergeMeList.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gpinilla <gpinilla@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 20:34:31 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/21 19:03:22 by gpinilla         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:19:18 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,26 @@ void PmergeMe::printList(std::list<int> list, int mode)
 	}
 }
 
+void PmergeMe::mergeInsertionList(std::list<int> &a, std::list<int> &b)
+{
+	std::list<int> a1;
+	std::list<int> b1;
+	int odd_a = -1;
+	int odd_b = -1;
+
+	if (a.size() % 2 != 0)
+	{
+		std::list<int>::iterator it_a = a.end();
+		--it_a;
+		odd_a = *it_a;
+		a.erase(it_a);
+		std::list<int>::iterator it_b = b.end();
+		--it_b;
+		odd_b = *it_b;
+		b.erase(it_b); 
+	}
+}
+
 void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una lista a otra podemos usar la funcion splice
 {
 	std::list<int> numbers;
@@ -47,23 +67,28 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 		odd = *it;
 		numbers.erase(it); 
 	}
-	for (std::list<int>::iterator it = numbers.begin(); it + 1 < numbers.size(); it += 2)
+
+	std::list<int>::iterator end = numbers.end();
+	end--;
+	end--;
+	for (std::list<int>::iterator it = numbers.begin(); it != end; it++)
 	{
 		std::list<int>::iterator next = it;
 		next++;
-		if (next != numbers.end())
+		if (*it < *next)
 		{
-			if (*it < *next)
-			{
-				a.push_back(*next);
-				b.push_back(*it);
-			}
-			else
-			{
-				a.push_back(*it);
-				b.push_back(*next)
-			}
+			a.push_back(*next);
+			b.push_back(*it);
+		}
+		else
+		{
+			a.push_back(*it);
+			b.push_back(*next);
 		}
 	}
 	mergeInsertionList(a, b);
+	std::list<int> jacobsthal;
+	int pos;
+	jacobsthal = jacobsthalGeneratorList(b.size());
+
 }
