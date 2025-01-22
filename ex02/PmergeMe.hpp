@@ -20,10 +20,10 @@ private:
 	
 	static int parse_args(const std::string& arg);
 	static std::vector<int> jacobsthalGenerator(int size);
-	static void mergeInsertionSort(std::vector<int> &a, std::vector<int> &b);
-	static void divideAndSortPairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1);
-	static void mergePairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1);
-	static int binarySearch(const std::vector<int>& a, int item, int maxIndex);
+	static void mergeInsertionSort(std::vector<int> &a);
+	static void divideAndSortPairs(std::vector<int> &a, std::vector<int> &b);
+	static void mergePairs(std::vector<int> &a, std::vector<int> &b);
+	static int binarySearch(const std::vector<int>& a, int item);
 	static void printVector(std::vector<int>vector, int mode);
 
 	static void mergeInsertionList(std::list<int> &a, std::list<int> &b);

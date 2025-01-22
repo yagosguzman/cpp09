@@ -17,6 +17,22 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& src)
 PmergeMe::~PmergeMe()
 {};
 
+void PmergeMe::printVector(std::vector<int>vector, int mode)
+{
+	if (mode == 0)
+		std::cout << "Before: ";
+	else if (mode == 1)
+		std::cout << "After: ";
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		std::cout << vector.at(i);
+		if (i + 1 != vector.size())
+			std::cout << " ";
+		else 
+			std::cout << "\n"<< std::endl;
+	}
+}
+
 std::vector<int> PmergeMe::jacobsthalGenerator(int size) {
     std::vector<int> series;
     int prev = 0;
@@ -35,9 +51,9 @@ std::vector<int> PmergeMe::jacobsthalGenerator(int size) {
     return series;
 }
 
-int PmergeMe::binarySearch(const std::vector<int>& a, int item, int maxIndex) {
+int PmergeMe::binarySearch(const std::vector<int>& a, int item) {
     int low = 0;
-    int high = maxIndex;
+    int high = a.size() - 1;
 	int mid;
 
     while (low <= high)
@@ -51,90 +67,56 @@ int PmergeMe::binarySearch(const std::vector<int>& a, int item, int maxIndex) {
     return low; // Once low > high that's our index to put it;
 }
 
-void PmergeMe::mergePairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1)
+void PmergeMe::mergePairs(std::vector<int> &a, std::vector<int> &b)
 {
-	std::vector<int> jacobsthal = jacobsthalGenerator(a1.size());
-	int pos;
-	for (size_t i = 0; i < a1.size(); i++)
-	{
-		pos = binarySearch(a, a1.at(jacobsthal.at(i) - 1), a.size() - 1);
-		a.insert(a.begin() + pos, a1.at(jacobsthal.at(i) - 1));
-		b.insert(b.begin() + pos, b1.at(jacobsthal.at(i) - 1));
-	}
+	std::vector<int> jacobsthal = jacobsthalGenerator(b.size());
+	for (size_t i = 0; i < b.size(); i++)
+		a.insert(a.begin() + binarySearch(a, b.at(jacobsthal.at(i) - 1)), b.at(jacobsthal.at(i) - 1));
 }
 
-void PmergeMe::divideAndSortPairs(std::vector<int> &a, std::vector<int> &b, std::vector<int> &a1, std::vector<int> &b1)
+void PmergeMe::divideAndSortPairs(std::vector<int> &a, std::vector<int> &b)
 {
-	std::vector<int> new_a, new_b; // Temporary vectors to store a & b;
+	std::vector<int> new_a;
 
     for (size_t i = 0; i + 1 < a.size(); i += 2)
 	{
         if (a[i] < a[i + 1])
 		{
-            a1.push_back(a[i]);
-            b1.push_back(b[i]);
+            b.push_back(a[i]);
             new_a.push_back(a[i + 1]);
-            new_b.push_back(b[i + 1]);
         }
 		else
 		{
-            a1.push_back(a[i + 1]);
-            b1.push_back(b[i + 1]);
+            b.push_back(a[i + 1]);
             new_a.push_back(a[i]);
-            new_b.push_back(b[i]);
         }
     }
-    a = new_a; // here we update the values of a & b with what we stored in new_a & new_b
-    b = new_b;
+    a = new_a;
 };
 
-void PmergeMe::mergeInsertionSort(std::vector<int>& a, std::vector<int>& b) {
-	std::vector<int> a1;
-	std::vector<int> b1;
-	int odd_a = -1;
-	int odd_b = -1;
+void PmergeMe::mergeInsertionSort(std::vector<int>& a) {
+	std::vector<int> b;
+	int odd = -1;
 
-	if (a.size() % 2 != 0){
-		odd_a = a.at(a.size() - 1);
+	if (a.size() % 2 != 0) {
+		odd = a.at(a.size() - 1);
 		a.erase(a.begin() + a.size() - 1);
-		odd_b = b.at(b.size() - 1);
-		b.erase(b.begin() + b.size() - 1);
 	}
-	divideAndSortPairs(a, b, a1, b1);
+	divideAndSortPairs(a, b);
 	if (a.size() > 2)
-		mergeInsertionSort(a, b);
+		mergeInsertionSort(a);
 	else if (a.size() == 2 && a.at(0) > a.at(1)) { 
 		int aux = a.at(0);
 		a.at(0) = a.at(1);
 		a.at(1) = aux;
 	}
-	mergePairs(a, b, a1, b1);
-	if (odd_a != -1) {
-		int pos = binarySearch(a, odd_a, a.size() - 1);
-		a.insert(a.begin() + pos, odd_a);
-		b.insert(b.begin() + pos, odd_b);
-	}
+	mergePairs(a, b);
+	if (odd != -1)
+		a.insert(a.begin() + binarySearch(a, odd), odd);
 }
 
-void PmergeMe::printVector(std::vector<int>vector, int mode)
-{
-	if (mode == 0)
-		std::cout << "Before: ";
-	else if (mode == 1)
-		std::cout << "After: ";
-	for (size_t i = 0; i < vector.size(); i++)
-	{
-		std::cout << vector.at(i);
-		if (i + 1 != vector.size())
-			std::cout << " ";
-		else 
-			std::cout << std::endl;
-	}
-}
 void PmergeMe::sort_v(size_t size, char** arg)
 {	std::vector<int> numbers;
-	std::vector<int> a;
-	std::vector<int> b;
 	int odd = -1;
 
 	for (size_t i = 0; i < size; i++)
@@ -146,32 +128,11 @@ void PmergeMe::sort_v(size_t size, char** arg)
 		odd = numbers.at(numbers.size() - 1);
 		numbers.erase(numbers.begin() + numbers.size() - 1);
 	}
-	
-	for (size_t i = 0; i + 1 < numbers.size(); i += 2)
-	{
-        if (numbers[i] < numbers[i + 1])
-		{
-            a.push_back(numbers[i + 1]);
-            b.push_back(numbers[i]);
-        }
-		else
-		{
-            a.push_back(numbers[i]);
-            b.push_back(numbers[i + 1]);
-        }
-	}
-	mergeInsertionSort(a, b);
-	std::vector<int> jacobsthal;
-	int pos;
-	jacobsthal = jacobsthalGenerator(b.size());
-	for (size_t i = 0; i < b.size(); i++) {
-		pos = binarySearch(a, b.at(jacobsthal.at(i) - 1), a.size() - 1);
-		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
-	}	
+	mergeInsertionSort(numbers);
 	if (odd != -1) 
-		a.insert(a.begin() + binarySearch(a, odd, a.size() - 1), odd);
+		numbers.insert(numbers.begin() + binarySearch(numbers, odd), odd);
 	std::clock_t end = std::clock();
-	printVector(a, 1);
+	printVector(numbers, 1);
 	double elapsed_microseconds = static_cast<double>(end - start) * 1000000.0 / CLOCKS_PER_SEC;
     std::cout << "Time to process a range of " << numbers.size() << " elements with std::vector : " << elapsed_microseconds << " us" << std::endl;
 };
