@@ -70,17 +70,13 @@ int PmergeMe::binarySearch(const std::vector<int>& a, int item) {
 void PmergeMe::mergePairs(std::vector<int> &a, std::vector<int> &b)
 {
 	std::vector<int> jacobsthal = jacobsthalGenerator(b.size());
-	int pos;
 	for (size_t i = 0; i < b.size(); i++)
-	{
-		pos = binarySearch(a, b.at(jacobsthal.at(i) - 1));
-		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
-	}
+		a.insert(a.begin() + binarySearch(a, b.at(jacobsthal.at(i) - 1)), b.at(jacobsthal.at(i) - 1));
 }
 
 void PmergeMe::divideAndSortPairs(std::vector<int> &a, std::vector<int> &b)
 {
-	std::vector<int> new_a; // Temporary vectors to store a
+	std::vector<int> new_a;
 
     for (size_t i = 0; i + 1 < a.size(); i += 2)
 	{
@@ -95,7 +91,7 @@ void PmergeMe::divideAndSortPairs(std::vector<int> &a, std::vector<int> &b)
             new_a.push_back(a[i]);
         }
     }
-    a = new_a; // here we update the values of a with what we stored in new_a
+    a = new_a;
 };
 
 void PmergeMe::mergeInsertionSort(std::vector<int>& a) {
@@ -115,10 +111,8 @@ void PmergeMe::mergeInsertionSort(std::vector<int>& a) {
 		a.at(1) = aux;
 	}
 	mergePairs(a, b);
-	if (odd != -1) {
-		int pos = binarySearch(a, odd);
-		a.insert(a.begin() + pos, odd);
-	}
+	if (odd != -1)
+		a.insert(a.begin() + binarySearch(a, odd), odd);
 }
 
 void PmergeMe::sort_v(size_t size, char** arg)
@@ -134,7 +128,6 @@ void PmergeMe::sort_v(size_t size, char** arg)
 		odd = numbers.at(numbers.size() - 1);
 		numbers.erase(numbers.begin() + numbers.size() - 1);
 	}
-
 	mergeInsertionSort(numbers);
 	if (odd != -1) 
 		numbers.insert(numbers.begin() + binarySearch(numbers, odd), odd);
