@@ -6,7 +6,7 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 20:34:31 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/21 19:19:18 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/22 18:20:38 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 	for (size_t i = 0; i < size; i++)
 		numbers.push_back(parse_args(arg[i]));
 	printList(numbers, 0);
-	//std::clock_t start = std::clock();
+	std::clock_t start = std::clock();
 	if (numbers.size() % 2 != 0)
 	{
 		std::list<int>::iterator it = numbers.end();
@@ -67,9 +67,7 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 		odd = *it;
 		numbers.erase(it); 
 	}
-
 	std::list<int>::iterator end = numbers.end();
-	end--;
 	end--;
 	for (std::list<int>::iterator it = numbers.begin(); it != end; it++)
 	{
@@ -85,10 +83,21 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 			a.push_back(*it);
 			b.push_back(*next);
 		}
+		it = next;
 	}
 	mergeInsertionList(a, b);
 	std::list<int> jacobsthal;
 	int pos;
 	jacobsthal = jacobsthalGeneratorList(b.size());
-
+	for (size_t i = 0; i < b.size(); i++)
+	{
+		pos = binarySearch(a, b.at(jacobsthal.at(i) - 1), a.size() - 1);
+		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
+	}
+	if (odd != -1)
+		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
+	std::clock_t end = std::clock();
+	printList(a, 1);
+	double elapsed_microseconds = static_cast<double>(end - start) * 1000000.0 / CLOCKS_PER_SEC;
+	std::cout << "Time to process a range of " << numbers.size() << " elements with std::list : " << elapsed_microseconds << " us" << std::endl;
 }
