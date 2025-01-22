@@ -24,11 +24,15 @@ private:
 	static void divideAndSortPairs(std::vector<int> &a, std::vector<int> &b);
 	static void mergePairs(std::vector<int> &a, std::vector<int> &b);
 	static int binarySearch(const std::vector<int>& a, int item);
-	static void printVector(std::vector<int>vector, int mode);
+	static void printVector(std::vector<int> &vector, int mode);
 
-	static void mergeInsertionList(std::list<int> &a, std::list<int> &b);
+	static void mergeInsertionList(std::list<int> &a);
 	static std::list<int> jacobsthalGeneratorList(int size);
-	static void printList(std::list<int> list, int mode);
+	static void divideSortList(std::list<int> &a, std::list<int> &b);
+	static std::list<int>::iterator binarySearchList(std::list<int>& a, int item);
+	static void mergePairsList(std::list<int> &a, std::list<int> &b);
+	static void printList(std::list<int> &list, int mode);
+
 
 	
 	public:

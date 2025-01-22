@@ -6,13 +6,55 @@
 /*   By: ysanchez <ysanchez@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 20:34:31 by ysanchez          #+#    #+#             */
-/*   Updated: 2025/01/22 18:20:38 by ysanchez         ###   ########.fr       */
+/*   Updated: 2025/01/22 21:39:36 by ysanchez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
 
-void PmergeMe::printList(std::list<int> list, int mode)
+std::list<int> PmergeMe::jacobsthalGeneratorList(int size) {
+	std::list<int> series;
+    int prev = 0;
+	int curr = 1;
+    while (curr <= size)
+	{
+        for (int i = curr; i > prev; --i)
+            series.push_back(i);
+        int next = curr + 2 * prev;
+        prev = curr;
+        curr = next;
+    }
+    if (prev < size) // In case size is not a Jacobsthal number we'll add from size to prev + 1 in the vector
+        for (int i = size; i > prev; --i)
+            series.push_back(i);
+    return series;
+}
+
+std::list<int>::iterator PmergeMe::binarySearchList(std::list<int>& a, int item) {
+    std::list<int>::iterator low = a.begin();
+    std::list<int>::iterator mid = a.begin();
+    int lowIndex = 0; // Contador para la posición del iterador en 'low'
+    int highIndex = std::distance(a.begin(), a.end()); // Número de elementos en la lista
+
+    while (lowIndex < highIndex) {
+        int midIndex = lowIndex + (highIndex - lowIndex) / 2;
+
+        // Avanzar 'mid' al punto medio
+        mid = a.begin();
+        std::advance(mid, midIndex);
+
+        if (item < *mid) {
+            highIndex = midIndex; // Reducir el rango superior
+        } else {
+            lowIndex = midIndex + 1; // Reducir el rango inferior
+            low = ++mid; // Mover el iterador 'low' también
+        }
+    }
+    // 'low' será el iterador donde se debe insertar el elemento
+    return low;
+}
+
+void PmergeMe::printList(std::list<int> &list, int mode)
 {
 	if (mode == 0)
 		std::cout << "Before: ";
@@ -29,31 +71,70 @@ void PmergeMe::printList(std::list<int> list, int mode)
 	}
 }
 
-void PmergeMe::mergeInsertionList(std::list<int> &a, std::list<int> &b)
+void PmergeMe::mergePairsList(std::list<int>& a, std::list<int>& b) {
+    std::list<int> jacobsthal = jacobsthalGeneratorList(b.size());
+
+    std::list<int>::iterator bIt;
+    std::list<int>::iterator jacobIt = jacobsthal.begin();
+
+    while (jacobIt != jacobsthal.end()) {
+        int index = *jacobIt - 1;
+        bIt = b.begin();
+        std::advance(bIt, index);
+        a.insert(binarySearchList(a, *bIt), *bIt);
+        ++jacobIt;
+    }
+}
+
+void PmergeMe::divideSortList(std::list<int> &a, std::list<int> &b)
 {
-	std::list<int> a1;
-	std::list<int> b1;
-	int odd_a = -1;
-	int odd_b = -1;
+	std::list<int> new_a;
+	for (std::list<int>::iterator it = a.begin(); it != a.end(); it++)
+	{
+		std::list<int>::iterator next = it;
+		++next;
+		if (*it < *next)
+		{
+			b.push_back(*it);
+			new_a.push_back(*next);
+		}
+		else
+		{
+			b.push_back(*next);
+			new_a.push_back(*it);
+		}
+		it = next;
+	}
+	a = new_a;
+}
+
+
+void PmergeMe::mergeInsertionList(std::list<int> &a)
+{
+	std::list<int> b;
+	int odd = -1;
 
 	if (a.size() % 2 != 0)
 	{
-		std::list<int>::iterator it_a = a.end();
-		--it_a;
-		odd_a = *it_a;
-		a.erase(it_a);
-		std::list<int>::iterator it_b = b.end();
-		--it_b;
-		odd_b = *it_b;
-		b.erase(it_b); 
+		std::list<int>::iterator it = a.end();
+		--it;
+		odd = *it;
+		a.erase(it); 
 	}
+	divideSortList(a, b);
+	if (a.size() > 2)
+		mergeInsertionList(a);
+	else if (a.size() == 2 && *a.begin() > *a.rbegin())
+		std::swap(*a.begin(), *a.rbegin());
+	mergePairsList(a, b);
+	if (odd != -1)
+		a.insert(binarySearchList(a, odd), odd);
+		
 }
 
 void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una lista a otra podemos usar la funcion splice
 {
 	std::list<int> numbers;
-	std::list<int> a;
-	std::list<int> b;
 	int odd = -1;
 
 	for (size_t i = 0; i < size; i++)
@@ -67,37 +148,22 @@ void PmergeMe::sort_l(size_t size, char** arg) // Para mover elementos de una li
 		odd = *it;
 		numbers.erase(it); 
 	}
-	std::list<int>::iterator end = numbers.end();
-	end--;
-	for (std::list<int>::iterator it = numbers.begin(); it != end; it++)
+	if (numbers.size() > 2)
+		mergeInsertionList(numbers);
+	else if (numbers.size() == 2 && *numbers.begin() > *numbers.rbegin())
+		std::swap(*numbers.begin(), *numbers.rbegin());
+	if (odd != -1)
+		numbers.insert(binarySearchList(numbers, odd), odd);
+	std::clock_t end = std::clock();
+	printList(numbers, 1);
+	for(std::list<int>::iterator it = numbers.begin(); it != numbers.end(); it++)
 	{
 		std::list<int>::iterator next = it;
-		next++;
-		if (*it < *next)
-		{
-			a.push_back(*next);
-			b.push_back(*it);
-		}
-		else
-		{
-			a.push_back(*it);
-			b.push_back(*next);
-		}
-		it = next;
+		++next;
+		if (next != numbers.end())
+			if (*it > *next)
+				std::cout << "Error at " << *it << std::endl;
 	}
-	mergeInsertionList(a, b);
-	std::list<int> jacobsthal;
-	int pos;
-	jacobsthal = jacobsthalGeneratorList(b.size());
-	for (size_t i = 0; i < b.size(); i++)
-	{
-		pos = binarySearch(a, b.at(jacobsthal.at(i) - 1), a.size() - 1);
-		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
-	}
-	if (odd != -1)
-		a.insert(a.begin() + pos, b.at(jacobsthal.at(i) - 1));
-	std::clock_t end = std::clock();
-	printList(a, 1);
 	double elapsed_microseconds = static_cast<double>(end - start) * 1000000.0 / CLOCKS_PER_SEC;
 	std::cout << "Time to process a range of " << numbers.size() << " elements with std::list : " << elapsed_microseconds << " us" << std::endl;
 }

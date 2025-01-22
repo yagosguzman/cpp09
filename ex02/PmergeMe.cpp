@@ -17,7 +17,7 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& src)
 PmergeMe::~PmergeMe()
 {};
 
-void PmergeMe::printVector(std::vector<int>vector, int mode)
+void PmergeMe::printVector(std::vector<int> &vector, int mode)
 {
 	if (mode == 0)
 		std::cout << "Before: ";
@@ -94,7 +94,8 @@ void PmergeMe::divideAndSortPairs(std::vector<int> &a, std::vector<int> &b)
     a = new_a;
 };
 
-void PmergeMe::mergeInsertionSort(std::vector<int>& a) {
+void PmergeMe::mergeInsertionSort(std::vector<int>& a)
+{
 	std::vector<int> b;
 	int odd = -1;
 
@@ -105,11 +106,8 @@ void PmergeMe::mergeInsertionSort(std::vector<int>& a) {
 	divideAndSortPairs(a, b);
 	if (a.size() > 2)
 		mergeInsertionSort(a);
-	else if (a.size() == 2 && a.at(0) > a.at(1)) { 
-		int aux = a.at(0);
-		a.at(0) = a.at(1);
-		a.at(1) = aux;
-	}
+	else if (a.size() == 2 && a.at(0) > a.at(1))
+		std::swap(a[0], a[1]);
 	mergePairs(a, b);
 	if (odd != -1)
 		a.insert(a.begin() + binarySearch(a, odd), odd);
@@ -118,7 +116,6 @@ void PmergeMe::mergeInsertionSort(std::vector<int>& a) {
 void PmergeMe::sort_v(size_t size, char** arg)
 {	std::vector<int> numbers;
 	int odd = -1;
-
 	for (size_t i = 0; i < size; i++)
 		numbers.push_back(parse_args(arg[i]));
 	printVector(numbers, 0);
@@ -128,11 +125,19 @@ void PmergeMe::sort_v(size_t size, char** arg)
 		odd = numbers.at(numbers.size() - 1);
 		numbers.erase(numbers.begin() + numbers.size() - 1);
 	}
-	mergeInsertionSort(numbers);
+	if (numbers.size() > 2)
+		mergeInsertionSort(numbers);
+	else if (numbers.size() == 2 && numbers.at(0) > numbers.at(1))
+		std::swap(numbers[0], numbers[1]);
 	if (odd != -1) 
 		numbers.insert(numbers.begin() + binarySearch(numbers, odd), odd);
 	std::clock_t end = std::clock();
 	printVector(numbers, 1);
+	for (size_t i = 1; i < numbers.size(); i++)
+	{
+		if (numbers.at(i) < numbers.at(i - 1))
+			std::cout << "ERROR AT :" << i << std::endl;
+	}
 	double elapsed_microseconds = static_cast<double>(end - start) * 1000000.0 / CLOCKS_PER_SEC;
     std::cout << "Time to process a range of " << numbers.size() << " elements with std::vector : " << elapsed_microseconds << " us" << std::endl;
 };

@@ -6,7 +6,7 @@
 		"type": "cppdbg",
 		"request": "launch",
 		"program": "${workspaceFolder}/ex02/PmergeMe",
-		"args": ["3", "4", "5", "6", "5", "4", "3", "4"],
+		"args": ["5", "4", "3", "1"],
 		"stopAtEntry": false,
 		"cwd": "${workspaceFolder}/ex02",
 		"environment": [],
