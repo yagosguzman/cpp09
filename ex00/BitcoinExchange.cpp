@@ -23,20 +23,16 @@ BitcoinExchange::BitcoinExchange()
 {
 	_mydata = transferData("data.csv", ',');
 }
-
 BitcoinExchange::BitcoinExchange(std::string file, char separator)
 {
 	_mydata = transferData(file, separator);
 }
-
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& copy)
 {
 	_mydata = copy._mydata;
 }
-
 BitcoinExchange::~BitcoinExchange()
 {}
-
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& src)
 {
 	_mydata = src._mydata;
